@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Proposal>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Project Type</th>
+            <th>Submitted On</th>
+            <th>PDF</th>
+            <th>Status</th>
+            <th>Action</th> 
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var proposal in Model)
+        {
+            <tr>
+                <td>@proposal.Title</td>
+                <td>@proposal.ProjectType</td>
+                <td>@proposal.SubmittedAt.ToString("g")</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(proposal.PdfPath))
+                    {
+                        <a href="@proposal.PdfPath" target="_blank">View</a>
+                    }
+                </td>
+                <td>@proposal.Status</td>
+                <td>
+                    <a asp-action="ViewProposalVersion" asp-route-id="@proposal.ProposalId" class="btn btn-sm btn-outline-primary">View Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+

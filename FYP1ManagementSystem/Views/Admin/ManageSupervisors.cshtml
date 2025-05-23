@@ -1,0 +1,45 @@
+﻿@model IEnumerable<FYP1ManagementSystem.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Manage Supervisors";
+}
+
+<h2>Manage Supervisors</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Faculty</th>
+            <th>Program</th>
+            <th>Committee?</th>
+            <th>Toggle</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.FullName</td>
+                <td>@s.Email</td>
+                <td>@s.Faculty</td>
+                <td>@s.AcademicProgram</td>
+                <td>@(s.IsCommittee ? "✅ Yes" : "❌ No")</td>
+                <td>
+                    <form asp-action="ToggleCommittee" method="post">
+                        <input type="hidden" name="id" value="@s.Id" />
+                        <button type="submit" class="btn btn-sm btn-warning">
+                            Toggle Committee
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

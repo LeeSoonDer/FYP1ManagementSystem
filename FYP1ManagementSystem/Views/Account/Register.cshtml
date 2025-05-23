@@ -1,0 +1,99 @@
+﻿@model FYP1ManagementSystem.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["RegisterSuccess"] != null)
+{
+    <div class="alert alert-success">@TempData["RegisterSuccess"]</div>
+}
+
+<form asp-action="Register" method="post">
+    <div class="form-group">
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" class="form-control" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FullName"></label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Faculty"></label>
+        <select asp-for="Faculty" class="form-control">
+            <option value="">-- Select Faculty --</option>
+            <option>FACULTY OF CIVIL ENGINEERING</option>
+            <option>FACULTY OF CHEMICAL ENGINEERING and Energy Engineering</option>
+            <option>FACULTY OF MECHANICAL ENGINEERING</option>
+            <option>FACULTY OF ELECTRICAL ENGINEERING</option>
+            <option>FACULTY OF COMPUTING</option>
+            <option>FACULTY OF ARTIFICIAL INTELLIGENCE</option>
+            <option>FACULTY OF SCIENCE</option>
+            <option>FACULTY OF BUILT ENVIRONMENT and Surveying</option>
+            <option>FACULTY OF SOCIAL SCIENCES and Humanities</option>
+            <option>FACULTY OF MANAGEMENT</option>
+            <option>MALAYSIA-JAPAN INTERNATIONAL Institute of Technology</option>
+            <option>AZMAN HASHIM INTERNATIONAL Business School</option>
+            <option>FACULTY OF EDUCATIONAL SCIENCES AND TECHNOLOGY</option>
+        </select>
+        <span asp-validation-for="Faculty" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Year"></label>
+        <select asp-for="Year" class="form-control">
+            <option value="">-- Select Year --</option>
+            <option>Year 3</option>
+            <option>Year 4</option>
+        </select>
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Semester"></label>
+        <select asp-for="Semester" class="form-control">
+            <option value="">-- Select Semester --</option>
+            <option>Semester 1</option>
+            <option>Semester 2</option>
+        </select>
+        <span asp-validation-for="Semester" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="AcademicSession"></label>
+        <input asp-for="AcademicSession" class="form-control" placeholder="e.g. 2024/2025" />
+        <span asp-validation-for="AcademicSession" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ConfirmPassword"></label>
+        <input asp-for="ConfirmPassword" class="form-control" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

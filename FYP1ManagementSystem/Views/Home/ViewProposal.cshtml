@@ -1,0 +1,54 @@
+﻿@model FYP1ManagementSystem.Models.Proposal
+
+@{
+    ViewData["Title"] = "Proposal Details";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+
+<h2>Proposal Details</h2>
+
+<table class="table">
+    <tr><th>Student</th><td>@Model.Student.FullName</td></tr>
+    <tr><th>Title</th><td>@Model.Title</td></tr>
+    <tr><th>Project Type</th><td>@Model.ProjectType</td></tr>
+    <tr><th>Status</th><td>@Model.Status</td></tr>
+    <tr>
+        <th>PDF</th>
+        <td>
+            @if (!string.IsNullOrEmpty(Model.PdfPath))
+            {
+                <a href="@Model.PdfPath" target="_blank">View PDF</a>
+            }
+        </td>
+    </tr>
+</table>
+
+<h4>Supervisor Comment</h4>
+
+@if (string.IsNullOrEmpty(Model.Evaluation1Status) && string.IsNullOrEmpty(Model.Evaluation2Status))
+{
+    <form asp-action="AddSupervisorComment" method="post">
+        <input type="hidden" name="id" value="@Model.ProposalId" />
+        <div class="form-group">
+            <textarea name="comment" class="form-control" rows="5">@Model.SupervisorComments</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Save Comment</button>
+    </form>
+}
+else
+{
+    <div class="alert alert-secondary">
+        Evaluator has already started assessment! Comments are now locked.
+    </div>
+    <p>@Model.SupervisorComments</p>
+}
+

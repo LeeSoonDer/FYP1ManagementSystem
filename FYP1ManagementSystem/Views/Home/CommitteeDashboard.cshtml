@@ -1,0 +1,139 @@
+﻿@model FYP1ManagementSystem.Models.CommitteeDashboardViewModel
+
+@{
+    ViewData["Title"] = "Committee Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Committee Dashboard</h2>
+    <a asp-action="ManageStudents" class="btn btn-outline-primary">
+        Manage Students
+    </a>
+</div>
+
+<!-- PROPOSAL TABLE -->
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Student</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Evaluator 1</th>
+            <th>Evaluator 2</th>
+            <th>Assign</th>
+            <th>Supervisor Approval</th>
+            <th>History</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model.Proposals)
+        {
+            <tr>
+                <td>@p.Student?.FullName</td>
+                <td>@p.Title</td>
+                <td>@p.ProjectType</td>
+                <td>
+                    @if (p.Status == "Approved")
+                    {
+                        <span class="text-success"><strong>@p.Status</strong></span>
+                    }
+                    else if (p.Status == "Approved with Condition")
+                    {
+                        <span class="text-warning"><strong>@p.Status</strong></span>
+                    }
+                    else if (p.Status == "Rejected")
+                    {
+                        <span class="text-danger"><strong>@p.Status</strong></span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">@p.Status</span>
+                    }
+                </td>
+
+                <form asp-action="AssignEvaluators" method="post">
+                <td>
+                    <select name="evaluator1Id" class="form-control">
+                        <option value="">-- Select --</option>
+                            @foreach (var e in Model.Evaluators.Where(e => e.Id != p.Student?.SupervisorId))
+                            {
+                            <option value="@e.Id" selected="@(p.Evaluator1Id == e.Id ? "selected" : null)">
+                                    @e.FullName (@e.Domain)
+                            </option>
+                            }
+                    </select>
+                    <small class="text-muted">@p.Evaluation1Status</small>
+                </td>
+                <td>
+                    <select name="evaluator2Id" class="form-control">
+                        <option value="">-- Select --</option>
+                            @foreach (var e in Model.Evaluators.Where(e => e.Id != p.Student?.SupervisorId))
+                            {
+                            <option value="@e.Id" selected="@(p.Evaluator2Id == e.Id ? "selected" : null)">
+                                    @e.FullName (@e.Domain)
+                            </option>
+                            }
+                    </select>
+                    <small class="text-muted">@p.Evaluation2Status</small>
+                </td>
+                <td>
+                    <input type="hidden" name="proposalId" value="@p.ProposalId" />
+                    <button type="submit" class="btn btn-sm btn-success">Save</button>
+                </td>
+                </form>
+
+                <td>
+                    @if (p.Student?.IsSupervisorApproved == true)
+                    {
+                        <span class="text-success">✅ Approved</span>
+                    }
+                    else
+                    {
+                        <form asp-action="ApproveSupervisor" method="post">
+                            <input type="hidden" name="studentId" value="@p.Student?.Id" />
+                            <button type="submit" class="btn btn-sm btn-warning">Approve</button>
+                        </form>
+                    }
+                </td>
+                <td>
+                    <a asp-action="ProposalHistory" asp-route-studentId="@p.StudentId" class="btn btn-sm btn-outline-secondary">
+                        View All
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- DOMAIN ASSIGNMENT TABLE -->
+<h3 class="mt-5">Assign Domain to Supervisors</h3>
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Supervisor</th>
+            <th>Current Domain</th>
+            <th>Assign</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sup in Model.Supervisors)
+        {
+            <tr>
+                <td>@sup.FullName</td>
+                <td>@sup.Domain ?? "-"</td>
+                <td>
+                    <form asp-action="AssignDomain" method="post" class="form-inline">
+                        <input type="hidden" name="supervisorId" value="@sup.Id" />
+                        <select name="domain" class="form-control me-2">
+                            <option value="">-- Select --</option>
+                            <option value="Research" selected="@(sup.Domain == "Research" ? "selected" : null)">Research</option>
+                            <option value="Development" selected="@(sup.Domain == "Development" ? "selected" : null)">Development</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-success">Save</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

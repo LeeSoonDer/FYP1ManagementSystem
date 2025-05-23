@@ -1,0 +1,49 @@
+﻿@model List<FYP1ManagementSystem.Models.ApplicationUser>
+
+@inject UserManager<FYP1ManagementSystem.Models.ApplicationUser> UserManager
+
+<h2>Manage Students (Committee)</h2>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Year</th>
+            <th>Semester</th>
+            <th>Supervisor</th>
+            <th>Approved?</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Model)
+        {
+            var supervisor = await UserManager.FindByIdAsync(student.SupervisorId ?? "");
+
+            <tr>
+                <td>@student.FullName</td>
+                <td>@student.Email</td>
+                <td>@student.Year</td>
+                <td>@student.Semester</td>
+                <td>@(supervisor?.FullName ?? "Not Selected")</td>
+                <td>
+                    @if (student.IsSupervisorApproved)
+                    {
+                        <span class="text-success">✅ Approved</span>
+                    }
+                    else if (!string.IsNullOrEmpty(student.SupervisorId))
+                    {
+                        <form asp-action="ApproveSupervisor" method="post">
+                            <input type="hidden" name="studentId" value="@student.Id" />
+                            <button type="submit" class="btn btn-sm btn-warning">Approve</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Supervisor</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

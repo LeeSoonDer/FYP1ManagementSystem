@@ -1,0 +1,35 @@
+﻿@model IEnumerable<FYP1ManagementSystem.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Choose Your Supervisor";
+}
+
+<h2>Choose Your Supervisor</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Faculty</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var supervisor in Model)
+        {
+            <tr>
+                <td>@supervisor.FullName</td>
+                <td>@supervisor.Email</td>
+                <td>@supervisor.Faculty</td>
+                <td>
+                    <form asp-action="SelectSupervisor" method="post">
+                        <input type="hidden" name="supervisorId" value="@supervisor.Id" />
+                        <button type="submit" class="btn btn-primary">Select</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

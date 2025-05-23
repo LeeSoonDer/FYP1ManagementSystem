@@ -1,0 +1,60 @@
+﻿@model List<FYP1ManagementSystem.Models.Proposal>
+
+@{
+    ViewData["Title"] = "Evaluator Dashboard";
+}
+
+<h2>Welcome Evaluator</h2>
+
+@if (Model.Any())
+{
+    <form asp-action="SubmitEvaluation" method="post">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Title</th>
+                    <th>PDF</th>
+                    <th>Status</th>
+                    <th>Comments</th>
+                    <th>Submit</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td>@p.Student?.FullName</td>
+                        <td>@p.Title</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(p.PdfPath))
+                            {
+                                <a href="@p.PdfPath" target="_blank">View PDF</a>
+                            }
+                        </td>
+                        <td>
+                            <select name="Status_@p.ProposalId" class="form-control">
+                                <option value="Approved" selected="@(p.Status == "Approved")">Approved</option>
+                                <option value="Approved with Condition" selected="@(p.Status == "Approved with Condition")">Approved with Condition</option>
+                                <option value="Rejected" selected="@(p.Status == "Rejected")">Rejected</option>
+                            </select>
+                        </td>
+                        <td>
+                            <textarea name="Comment_@p.ProposalId" class="form-control">@p.EvaluatorComments</textarea>
+                        </td>
+                        <td>
+                            <button type="submit" name="proposalId" value="@p.ProposalId" class="btn btn-primary">Submit</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>
+}
+else
+{
+    <p>No proposals assigned to you.</p>
+}
+
+<a asp-action="ProposalHistory">View Proposal History</a>
+

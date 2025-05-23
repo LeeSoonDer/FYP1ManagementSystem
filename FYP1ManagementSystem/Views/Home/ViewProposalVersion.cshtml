@@ -1,0 +1,44 @@
+﻿@model FYP1ManagementSystem.Models.Proposal
+
+@{
+    ViewData["Title"] = "Proposal Details (Version)";
+}
+
+<h2>Proposal Detail</h2>
+
+<table class="table">
+    <tr><th>Student</th><td>@Model.Student.FullName</td></tr>
+    <tr><th>Title</th><td>@Model.Title</td></tr>
+    <tr><th>Project Type</th><td>@Model.ProjectType</td></tr>
+    <tr><th>Status</th><td>@Model.Status</td></tr>
+    <tr><th>Submitted At</th><td>@Model.SubmittedAt.ToString("g")</td></tr>
+    <tr>
+        <th>PDF</th>
+        <td>
+            @if (!string.IsNullOrEmpty(Model.PdfPath))
+            {
+                <a href="@Model.PdfPath" class="btn btn-outline-primary" target="_blank">📄 View PDF</a>
+                <a href="@Model.PdfPath" download class="btn btn-outline-success ms-2">⬇️ Download PDF</a>
+            }
+
+            else
+            {
+                <span class="text-muted">No file uploaded</span>
+            }
+        </td>
+    </tr>
+    <tr>
+        <th>Supervisor Comments</th>
+        <td>@Model.SupervisorComments ?? "(None)"</td>
+    </tr>
+    <tr>
+        <th>Evaluator 1 Comments</th>
+        <td>@Model.Evaluation1Status - @Model.Evaluator1Comment</td>
+    </tr>
+    <tr>
+        <th>Evaluator 2 Comments</th>
+        <td>@Model.Evaluation2Status - @Model.Evaluator2Comment</td>
+    </tr>
+</table>
+
+<a asp-action="ProposalHistory" class="btn btn-secondary">Back</a>

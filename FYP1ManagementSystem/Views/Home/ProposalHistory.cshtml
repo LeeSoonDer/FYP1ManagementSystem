@@ -1,36 +1,104 @@
 ﻿@model IEnumerable<Proposal>
+@inject UserManager<FYP1ManagementSystem.Models.ApplicationUser> UserManager
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Project Type</th>
-            <th>Submitted On</th>
-            <th>PDF</th>
-            <th>Status</th>
-            <th>Action</th> 
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var proposal in Model)
+@{
+    ViewData["Title"] = "Proposal History";
+    var user = await UserManager.GetUserAsync(User);
+    var isCommittee = user.IsCommittee;
+    var viewingOthers = ViewBag.TargetStudentName != null;
+}
+
+<div class="container mt-5">
+    <div class="my-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-primary">
+                @if (viewingOthers)
+                {
+                    <text>Proposal History of @ViewBag.TargetStudentName</text>
+                }
+                else
+                {
+                    <text>Your Proposal History</text>
+                }
+            </h4>
+
+            @if (User.IsInRole("Student"))
+            {
+                <a asp-action="StudentDashboard" class="btn btn-secondary">← Back</a>
+            }
+            else if (isCommittee)
+            {
+                <a asp-action="CommitteeDashboard" class="btn btn-secondary">← Committee Dashboard</a>
+            }
+        </div>
+
+        @if (!Model.Any())
         {
-            <tr>
-                <td>@proposal.Title</td>
-                <td>@proposal.ProjectType</td>
-                <td>@proposal.SubmittedAt.ToString("g")</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(proposal.PdfPath))
-                    {
-                        <a href="@proposal.PdfPath" target="_blank">View</a>
-                    }
-                </td>
-                <td>@proposal.Status</td>
-                <td>
-                    <a asp-action="ViewProposalVersion" asp-route-id="@proposal.ProposalId" class="btn btn-sm btn-outline-primary">View Details</a>
-                </td>
-            </tr>
+            <div class="alert alert-info">No proposals submitted yet.</div>
         }
-    </tbody>
-
-</table>
-
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Title</th>
+                            <th>Project Type</th>
+                            <th>Submitted On</th>
+                            <th>PDF</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var proposal in Model)
+                        {
+                            <tr>
+                                <td>@proposal.Title</td>
+                                <td>@proposal.ProjectType</td>
+                                <td>@proposal.SubmittedAt.ToString("g")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(proposal.PdfPath))
+                                    {
+                                        <a href="@proposal.PdfPath" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            View PDF
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No file</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (proposal.Status == "Approved")
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (proposal.Status == "Approved with Condition")
+                                    {
+                                        <span class="badge bg-warning text-dark">Approved w/ Condition</span>
+                                    }
+                                    else if (proposal.Status == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">Rejected</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">@proposal.Status</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="ViewProposalVersion"
+                                       asp-route-id="@proposal.ProposalId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

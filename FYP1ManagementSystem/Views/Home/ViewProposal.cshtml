@@ -4,51 +4,111 @@
     ViewData["Title"] = "Proposal Details";
 }
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+<div class="container mt-4">
+    <div class="my-card">
 
+        <h3 class="mb-4 text-primary">Proposal Details</h3>
 
-<h2>Proposal Details</h2>
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
 
-<table class="table">
-    <tr><th>Student</th><td>@Model.Student.FullName</td></tr>
-    <tr><th>Title</th><td>@Model.Title</td></tr>
-    <tr><th>Project Type</th><td>@Model.ProjectType</td></tr>
-    <tr><th>Status</th><td>@Model.Status</td></tr>
-    <tr>
-        <th>PDF</th>
-        <td>
-            @if (!string.IsNullOrEmpty(Model.PdfPath))
+        <table class="table table-bordered align-middle">
+            <tr>
+                <th style="width: 200px;">Student</th>
+                <td>@Model.Student.FullName</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>@Model.Title</td>
+            </tr>
+            <tr>
+                <th>Project Type</th>
+                <td>@Model.ProjectType</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>
+                    @if (Model.Status == "Approved")
+                    {
+                        <span class="badge bg-success">@Model.Status</span>
+                    }
+                    else if (Model.Status == "Approved with Condition")
+                    {
+                        <span class="badge bg-warning text-dark">@Model.Status</span>
+                    }
+                    else if (Model.Status == "Rejected")
+                    {
+                        <span class="badge bg-danger">@Model.Status</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@Model.Status</span>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Proposal PDF</th>
+                <td>
+                    @if (!string.IsNullOrEmpty(Model.PdfPath))
+                    {
+                        <a href="@Model.PdfPath" target="_blank" class="btn btn-sm btn-outline-primary">📥 View PDF</a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No file uploaded</span>
+                    }
+                </td>
+            </tr>
+        </table>
+
+        <h5 class="mt-4">Supervisor Comment</h5>
+
+        @if (string.IsNullOrEmpty(Model.Evaluation1Status) && string.IsNullOrEmpty(Model.Evaluation2Status))
+        {
+            <form asp-action="AddSupervisorComment" method="post">
+                <input type="hidden" name="id" value="@Model.ProposalId" />
+                <div class="mb-3">
+                    <textarea name="comment" class="form-control" rows="5" placeholder="Write your comment here...">@Model.SupervisorComments</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">💾 Save Comment</button>
+            </form>
+        }
+        else
+        {
+            @if (!string.IsNullOrEmpty(Model.Evaluation1Status) || !string.IsNullOrEmpty(Model.Evaluation2Status))
             {
-                <a href="@Model.PdfPath" target="_blank">View PDF</a>
+                <div class="bg-white p-3 border rounded mt-3">
+                    <h4 class="text-primary">Evaluator Feedback</h4>
+                    <div class="mb-2">
+                        <strong>Evaluator 1:</strong>
+                        <span class="badge bg-secondary">@Model.Evaluation1Status</span>
+                        <p>@Model.Evaluator1Comment</p>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Evaluator 2:</strong>
+                        <span class="badge bg-secondary">@Model.Evaluation2Status</span>
+                        <p>@Model.Evaluator2Comment</p>
+                    </div>
+                </div>
+
             }
-        </td>
-    </tr>
-</table>
 
-<h4>Supervisor Comment</h4>
+            <div class="alert alert-secondary">
+                🔒 Evaluation has already started. Comment section is now locked.
+            </div>
+            <div class="bg-light border rounded p-3">
+                <p>@Model.SupervisorComments</p>
+            </div>
+        }
 
-@if (string.IsNullOrEmpty(Model.Evaluation1Status) && string.IsNullOrEmpty(Model.Evaluation2Status))
-{
-    <form asp-action="AddSupervisorComment" method="post">
-        <input type="hidden" name="id" value="@Model.ProposalId" />
-        <div class="form-group">
-            <textarea name="comment" class="form-control" rows="5">@Model.SupervisorComments</textarea>
+        <div class="mt-4 text-end">
+            <a href="/Home/SupervisorDashboard" class="btn btn-outline-secondary">← Back to Dashboard</a>
         </div>
-        <button type="submit" class="btn btn-primary mt-2">Save Comment</button>
-    </form>
-}
-else
-{
-    <div class="alert alert-secondary">
-        Evaluator has already started assessment! Comments are now locked.
     </div>
-    <p>@Model.SupervisorComments</p>
-}
-
+</div>

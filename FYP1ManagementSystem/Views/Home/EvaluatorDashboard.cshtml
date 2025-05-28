@@ -4,57 +4,80 @@
     ViewData["Title"] = "Evaluator Dashboard";
 }
 
-<h2>Welcome Evaluator</h2>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Evaluator Dashboard</h2>
+        <a asp-action="ProposalHistory" class="btn my-btn my-btn-primary">View Proposal History</a>
+    </div>
 
-@if (Model.Any())
-{
-    <form asp-action="SubmitEvaluation" method="post">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Title</th>
-                    <th>PDF</th>
-                    <th>Status</th>
-                    <th>Comments</th>
-                    <th>Submit</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var p in Model)
-                {
-                    <tr>
-                        <td>@p.Student?.FullName</td>
-                        <td>@p.Title</td>
-                        <td>
-                            @if (!string.IsNullOrEmpty(p.PdfPath))
+    @if (Model.Any())
+    {
+        <div class="my-card">
+            <form asp-action="SubmitEvaluation" method="post">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Student</th>
+                                <th>Title</th>
+                                <th>PDF</th>
+                                <th>Status</th>
+                                <th>Comments</th>
+                                <th>Submit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in Model)
                             {
-                                <a href="@p.PdfPath" target="_blank">View PDF</a>
+                                <tr>
+                                    <td>@p.Student?.FullName</td>
+                                    <td>@p.Title</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(p.PdfPath))
+                                        {
+                                            <a href="@p.PdfPath" target="_blank" class="btn btn-sm btn-outline-secondary">📄 View PDF</a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">No file</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <select name="Status_@p.ProposalId" class="form-select form-select-sm">
+                                            <option value="Approved" selected="@(p.Status == "Approved")">Approved</option>
+                                            <option value="Approved with Condition" selected="@(p.Status == "Approved with Condition")">Approved with Condition</option>
+                                            <option value="Rejected" selected="@(p.Status == "Rejected")">Rejected</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <textarea name="Comment_@p.ProposalId" class="form-control" rows="3" placeholder="Your comment...">@p.EvaluatorComments</textarea>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(p.Evaluator1Comment) || !string.IsNullOrEmpty(p.Evaluator2Comment))
+                                        {
+                                            <button class="btn btn-success btn-sm" disabled>✅ Submitted</button>
+                                            <a asp-action="EditEvaluation" asp-route-id="@p.ProposalId" class="btn btn-outline-secondary btn-sm ms-2">Edit</a>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" name="proposalId" value="@p.ProposalId" class="btn btn-primary btn-sm">Submit</button>
+                                        }
+
+                                        <a asp-action="EditEvaluation" asp-route-id="@p.ProposalId" class="btn btn-outline-secondary btn-sm ms-1">Edit</a>
+
+                                    </td>
+                                </tr>
                             }
-                        </td>
-                        <td>
-                            <select name="Status_@p.ProposalId" class="form-control">
-                                <option value="Approved" selected="@(p.Status == "Approved")">Approved</option>
-                                <option value="Approved with Condition" selected="@(p.Status == "Approved with Condition")">Approved with Condition</option>
-                                <option value="Rejected" selected="@(p.Status == "Rejected")">Rejected</option>
-                            </select>
-                        </td>
-                        <td>
-                            <textarea name="Comment_@p.ProposalId" class="form-control">@p.EvaluatorComments</textarea>
-                        </td>
-                        <td>
-                            <button type="submit" name="proposalId" value="@p.ProposalId" class="btn btn-primary">Submit</button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </form>
-}
-else
-{
-    <p>No proposals assigned to you.</p>
-}
-
-<a asp-action="ProposalHistory">View Proposal History</a>
-
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No proposals have been assigned to you yet.
+        </div>
+    }
+</div>

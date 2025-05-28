@@ -1,42 +1,77 @@
-﻿@model IEnumerable<FYP1ManagementSystem.Models.ApplicationUser>
+﻿@model IEnumerable<FYP1ManagementSystem.Models.UserWithRolesViewModel>
 
 @{
     ViewData["Title"] = "Manage Supervisors";
+    var currentProgram = ViewBag.ProgramFilter as string ?? "";
+    var currentCommittee = ViewBag.CommitteeFilter as string ?? "";
 }
 
-<h2>Manage Supervisors</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Manage Supervisors</h2>
+    <a asp-action="AdminDashboard" class="btn btn-outline-secondary">← Back to Dashboard</a>
+</div>
+
+<!-- Filters -->
+<form method="get" asp-action="ManageSupervisors" class="row g-3 mb-4">
+    <div class="col-md-4">
+        <select name="programFilter" class="form-select">
+            <option value="">All Programs</option>
+            <option value="Data Engineering" selected="@(currentProgram == "Data Engineering")">Data Engineering</option>
+            <option value="Software Engineering" selected="@(currentProgram == "Software Engineering")">Software Engineering</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <select name="committeeFilter" class="form-select">
+            <option value="">All</option>
+            <option value="Committee" selected="@(currentCommittee == "Committee")">Committee Only</option>
+            <option value="NonCommittee" selected="@(currentCommittee == "NonCommittee")">Non-Committee Only</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-primary w-100">🔍 Filter</button>
+    </div>
+</form>
 
 @if (TempData["Success"] != null)
 {
     <div class="alert alert-success">@TempData["Success"]</div>
 }
 
-<table class="table table-bordered">
-    <thead>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
         <tr>
             <th>Name</th>
             <th>Email</th>
             <th>Faculty</th>
             <th>Program</th>
+            <th>Roles</th>
             <th>Committee?</th>
             <th>Toggle</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var s in Model)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>@s.FullName</td>
-                <td>@s.Email</td>
-                <td>@s.Faculty</td>
-                <td>@s.AcademicProgram</td>
-                <td>@(s.IsCommittee ? "✅ Yes" : "❌ No")</td>
+                <td>@item.User.FullName</td>
+                <td>@item.User.Email</td>
+                <td>@item.User.Faculty</td>
+                <td>@item.User.AcademicProgram</td>
+                <td>@string.Join(", ", item.Roles)</td>
+                <td>
+                    @if (item.User.IsCommittee)
+                    {
+                        <span class="badge bg-success">✅ Yes</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">❌ No</span>
+                    }
+                </td>
                 <td>
                     <form asp-action="ToggleCommittee" method="post">
-                        <input type="hidden" name="id" value="@s.Id" />
-                        <button type="submit" class="btn btn-sm btn-warning">
-                            Toggle Committee
-                        </button>
+                        <input type="hidden" name="id" value="@item.User.Id" />
+                        <button type="submit" class="btn btn-sm btn-warning">Toggle</button>
                     </form>
                 </td>
             </tr>

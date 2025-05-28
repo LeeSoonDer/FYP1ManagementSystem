@@ -1,118 +1,113 @@
-﻿@{
-    ViewData["Title"] = "Student Dashboard";
-}
-
+﻿@model FYP1ManagementSystem.Models.ApplicationUser
 @inject UserManager<FYP1ManagementSystem.Models.ApplicationUser> UserManager
 @inject FYP1ManagementSystem.Data.AppDbContext DbContext
 
 @{
+    ViewData["Title"] = "Student Dashboard";
     var student = await UserManager.GetUserAsync(User);
     var proposal = DbContext.Proposals.FirstOrDefault(p => p.StudentId == student.Id);
 }
 
-<h2>Welcome Student!</h2>
-<p>This is your dashboard. You can register a supervisor, submit your proposal, and track its status.</p>
+<div class="container mt-4">
+    <div class="my-card">
+        <h2 class="mb-3 text-primary">🎓 Welcome, @student.FullName!</h2>
+        <p class="text-muted">This is your dashboard. You can choose your supervisor, submit your proposal, and monitor the review status.</p>
 
-<a href="/Home/SubmitProposal" class="btn btn-info">Submit Proposal</a>
-<a href="/Home/ChooseSupervisor" class="btn btn-success">Choose Supervisor</a>
+        <div class="d-flex gap-3 mb-4">
+            <a href="/Home/SubmitProposal" class="btn btn-outline-info">📤 Submit Proposal</a>
+            <a href="/Home/ChooseSupervisor" class="btn btn-outline-success">Choose Supervisor</a>
+            <a asp-action="ProposalHistory" class="btn btn-outline-secondary">Proposal History</a>
+        </div>
 
-@if (!string.IsNullOrEmpty(Model.SupervisorId))
-{
-    if (Model.IsSupervisorApproved)
-    {
-        var supervisor = await UserManager.FindByIdAsync(Model.SupervisorId);
-        <p class="text-success">
-            ✅ Your supervisor is: <strong>@supervisor.FullName</strong> (Approved)
-        </p>
-
-        @if (!Model.IsStudentAgreed)
+        @if (!string.IsNullOrEmpty(Model.SupervisorId))
         {
-            <div class="modal show fade" tabindex="-1" style="display:block; background-color: rgba(0,0,0,0.5);">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form asp-action="AgreeWithSupervisor" method="post">
-                            @Html.AntiForgeryToken()
-                            <div class="modal-header">
-                                <h5 class="modal-title">FYP1 Supervision Agreement</h5>
-                            </div>
-                            <div class="modal-body">
-                                <p>Before proceeding, please read and agree to the following terms:</p>
-                                <ul>
-                                    <li>You agree to maintain academic integrity and submit your own work.</li>
-                                    <li>Your supervisor agrees to provide appropriate guidance.</li>
-                                    <li>Both parties are responsible for consistent communication and meeting timelines.</li>
-                                    <li>Disagreements must be reported to the committee in a timely manner.</li>
-                                </ul>
-                                <p>By clicking <strong>I Agree</strong>, you confirm your acceptance of this agreement.</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-success">I Agree</button>
-                            </div>
-                        </form>
-                    </div>
+            if (Model.IsSupervisorApproved)
+            {
+                var supervisor = await UserManager.FindByIdAsync(Model.SupervisorId);
+                <div class="alert alert-success mb-4">
+                    ✅ Your supervisor is: <strong>@supervisor.FullName</strong> (Approved)
                 </div>
+
+                if (!Model.IsStudentAgreed)
+                {
+                    <div class="modal show fade" tabindex="-1" style="display:block; background-color: rgba(0,0,0,0.5);">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form asp-action="AgreeWithSupervisor" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">🤝 FYP1 Supervision Agreement</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Please confirm the following terms:</p>
+                                        <ul>
+                                            <li>You commit to academic integrity and timely work.</li>
+                                            <li>Your supervisor will provide guidance and support.</li>
+                                            <li>Both parties must maintain communication.</li>
+                                            <li>Issues should be reported to the committee if unresolved.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">I Agree</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    if (Model.IsStudentAgreed && Model.IsSupervisorAgreed)
+                    {
+                        <div class="alert alert-success">✅ Agreement complete. Supervision officially started.</div>
+                    }
+                    else if (Model.IsStudentAgreed && !Model.IsSupervisorAgreed)
+                    {
+                        <div class="alert alert-warning">⏳ Waiting for supervisor agreement.</div>
+                    }
+                    else if (!Model.IsStudentAgreed && Model.IsSupervisorAgreed)
+                    {
+                        <div class="alert alert-warning">⏳ Supervisor agreed. Please confirm the agreement.</div>
+                    }
+                }
+            }
+            else
+            {
+                <div class="alert alert-warning">⏳ Your supervisor selection is pending committee approval.</div>
+            }
+        }
+
+        @if (proposal != null)
+        {
+            <div class="mt-4">
+                <h4 class="text-info">Your Current Proposal</h4>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Title:</strong> @proposal.Title</li>
+                    <li class="list-group-item"><strong>Type:</strong> @proposal.ProjectType</li>
+                    <li class="list-group-item"><strong>Status:</strong> @proposal.Status</li>
+                    @if (!string.IsNullOrEmpty(proposal.EvaluatorComments))
+                    {
+                        <li class="list-group-item"><strong>Evaluator Comments:</strong> @proposal.EvaluatorComments</li>
+                    }
+                    @if (!string.IsNullOrEmpty(proposal.PdfPath))
+                    {
+                        <li class="list-group-item">
+                            <a href="@proposal.PdfPath" target="_blank" class="btn btn-sm btn-outline-primary">📥 View Uploaded Proposal</a>
+                        </li>
+                    }
+
+                    <li class="list-group-item">
+                        <a asp-action="ViewProposalVersion" asp-route-id="@proposal.ProposalId" class="btn btn-outline-primary btn-sm">
+                            🔍 View Details
+                        </a>
+                    </li>
+
+                </ul>
             </div>
         }
         else
         {
-            if (Model.IsStudentAgreed && Model.IsSupervisorAgreed)
-            {
-                <div class="alert alert-success">
-                    ✅ You and your supervisor have both confirmed the agreement. Supervision officially started.
-                </div>
-            }
-            else if (Model.IsStudentAgreed && !Model.IsSupervisorAgreed)
-            {
-                <div class="alert alert-warning">
-                    🕐 Waiting for your supervisor to confirm the agreement.
-                </div>
-            }
-			else if (!Model.IsStudentAgreed && Model.IsSupervisorAgreed)
-			{
-				<div class="alert alert-warning">
-					🕐 Your supervisor has confirmed the agreement. Please confirm to start supervision.
-				</div>
-			}
+            <p class="text-muted mt-4">You have not submitted any proposal yet.</p>
         }
-    }
-    else
-    {
-        <p class="text-warning">
-            🕐 Your supervisor selection is pending committee approval.
-        </p>
-    }
-}
-
-@if (proposal != null)
-{
-    <div class="mt-4">
-        <h4>Your Proposal</h4>
-        <ul class="list-group">
-            <li class="list-group-item"><strong>Title:</strong> @proposal.Title</li>
-            <li class="list-group-item"><strong>Type:</strong> @proposal.ProjectType</li>
-            <li class="list-group-item"><strong>Status:</strong> @proposal.Status</li>
-
-            @if (!string.IsNullOrEmpty(proposal.EvaluatorComments))
-            {
-                <li class="list-group-item">
-                    <strong>Evaluator Comments:</strong> @proposal.EvaluatorComments
-                </li>
-            }
-
-            @if (!string.IsNullOrEmpty(proposal.PdfPath))
-            {
-                <li class="list-group-item">
-                    <a href="@proposal.PdfPath" target="_blank">View Uploaded Proposal Form (PDF)</a>
-                </li>
-            }
-
-        </ul>
     </div>
-}
-else
-{
-    <p class="mt-4 text-muted">You have not submitted any proposal yet.</p>
-}
-
-<a asp-action="ProposalHistory">View Proposal History</a>
-
+</div>

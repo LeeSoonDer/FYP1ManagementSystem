@@ -82,5 +82,67 @@ namespace FYP1ManagementSystem.Controllers
 
             return RedirectToAction("ManageSupervisors");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageSupervisors(string programFilter, string committeeFilter)
+        {
+            var users = _userManager.Users
+                .Where(u => u.AcademicProgram != null) // Supervisors only
+                .ToList();
+
+            if (!string.IsNullOrEmpty(programFilter))
+                users = users.Where(s => s.AcademicProgram == programFilter).ToList();
+
+            if (!string.IsNullOrEmpty(committeeFilter))
+            {
+                if (committeeFilter == "Committee")
+                    users = users.Where(s => s.IsCommittee).ToList();
+                else if (committeeFilter == "NonCommittee")
+                    users = users.Where(s => !s.IsCommittee).ToList();
+            }
+
+            var userViewModels = new List<UserWithRolesViewModel>();
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userViewModels.Add(new UserWithRolesViewModel
+                {
+                    User = user,
+                    Roles = roles.ToList()
+                });
+            }
+
+            ViewBag.ProgramFilter = programFilter;
+            ViewBag.CommitteeFilter = committeeFilter;
+
+            return View(userViewModels);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ViewUsersByProgram(string program)
+        {
+            var users = _userManager.Users.ToList();
+
+            if (!string.IsNullOrEmpty(program))
+                users = users.Where(u => u.AcademicProgram == program).ToList();
+
+            var userViewModels = new List<UserWithRolesViewModel>();
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userViewModels.Add(new UserWithRolesViewModel
+                {
+                    User = user,
+                    Roles = roles.ToList()
+                });
+            }
+
+            ViewBag.Program = program;
+            return View(userViewModels);
+        }
+
+
+
     }
 }

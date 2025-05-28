@@ -1,11 +1,27 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <div class="my-card text-center">
+        <h1 class="display-5 text-primary mb-3">🎓 Welcome to FYP1 Management System</h1>
+        <p class="lead text-muted mb-4">
+            Manage your final year project submissions, supervisor selection, and evaluations easily and efficiently.
+        </p>
 
-    <a href="/Account/Register" class="btn btn-primary btn-lg mx-2">Register</a>
-    <a href="/Account/Login" class="btn btn-secondary btn-lg mx-2">Login</a>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/Account/Register" class="btn my-btn my-btn-primary btn-lg">
+                📝 Register
+            </a>
+            <a href="/Account/Login" class="btn my-btn my-btn-secondary btn-lg">
+                🔐 Login
+            </a>
+        </div>
+
+        <hr class="my-4" />
+
+        <p>
+            📘 Learn more about <a href="https://learn.microsoft.com/aspnet/core" target="_blank" class="text-decoration-underline">ASP.NET Core</a>
+        </p>
+    </div>
 </div>

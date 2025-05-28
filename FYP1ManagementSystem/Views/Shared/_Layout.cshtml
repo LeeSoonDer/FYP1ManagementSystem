@@ -4,82 +4,105 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FYP1ManagementSystem</title>
-    <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/FYP1ManagementSystem.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">FYP1ManagementSystem</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+    <header class="mb-4 shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+            <div class="container-lg">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">FYP1ManagementSystem</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto">
                         @using Microsoft.AspNetCore.Identity
                         @inject UserManager<FYP1ManagementSystem.Models.ApplicationUser> UserManager
                         @inject SignInManager<FYP1ManagementSystem.Models.ApplicationUser> SignInManager
+                        @inject FYP1ManagementSystem.Data.AppDbContext DbContext
 
-                        <div class="navbar-nav ml-auto">
-                            @if (SignInManager.IsSignedIn(User))
-                            {
-                                var user = await UserManager.GetUserAsync(User);
-                                var roles = await UserManager.GetRolesAsync(user);
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            var user = await UserManager.GetUserAsync(User);
+                            var roles = await UserManager.GetRolesAsync(user);
+                            bool isEvaluator = DbContext.Proposals.Any(p => p.Evaluator1Id == user.Id || p.Evaluator2Id == user.Id);
 
-                                <span class="navbar-text text-primary mr-3">
-                                    👋 @user.FullName (@roles.FirstOrDefault())
+                            <li class="nav-item">
+                                <span class="navbar-text text-primary me-3">
+                                    👋 @user.FullName (@string.Join(", ", roles))
                                 </span>
+                            </li>
 
-                                @if (roles.Contains("Admin"))
-                                {
-                                    <a class="nav-link" href="/Admin/AdminDashboard">Admin Dashboard</a>
-                                }
-                                else if (roles.Contains("Student"))
-                                {
-                                    <a class="nav-link" href="/Home/StudentDashboard">Student Dashboard</a>
-                                }
-                                else if (roles.Contains("Supervisor"))
-                                {
-                                    <a class="nav-link" href="/Home/SupervisorDashboard">Supervisor Dashboard</a>
-                                }
-
-                                <form method="post" asp-controller="Account" asp-action="Logout" class="form-inline">
-                                    <button type="submit" class="btn btn-link nav-link text-danger">Logout</button>
-                                </form>
+                            @if (roles.Contains("Admin"))
+                            {
+                                <li class="nav-item"><a class="nav-link" href="/Admin/AdminDashboard">Admin Dashboard</a></li>
                             }
                             else
                             {
-                                <a class="nav-link" href="/Account/Login">Login</a>
-                                <a class="nav-link" href="/Account/Register">Register</a>
-                            }
-                        </div>
+                                if (roles.Contains("Student"))
+                                {
+                                    <li class="nav-item"><a class="nav-link" href="/Home/StudentDashboard">Student Dashboard</a></li>
+                                    ;
+                                }
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                                if (roles.Contains("Supervisor"))
+                                {
+                                    <li class="nav-item"><a class="nav-link" href="/Home/SupervisorDashboard">Supervisor Dashboard</a></li>
+                                    ;
+                                }
+
+                                if (user.IsCommittee)
+                                {
+                                    <li class="nav-item"><a class="nav-link" href="/Home/CommitteeDashboard">Committee Dashboard</a></li>
+                                    ;
+                                }
+
+                                if (isEvaluator)
+                                {
+                                    <li class="nav-item"><a class="nav-link" href="/Home/EvaluatorDashboard">Evaluator Dashboard</a></li>
+                                    ;
+                                }
+                            }
+
+                            <li class="nav-item">
+                                <form method="post" asp-controller="Account" asp-action="Logout" class="d-inline">
+                                    <button type="submit" class="btn btn-link nav-link text-danger">Logout</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link" href="/Account/Login">Login</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/Account/Register">Register</a></li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - FYP1ManagementSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main class="container-lg pb-5">
+        @RenderBody()
+    </main>
+
+    <footer class="footer bg-light border-top text-muted py-3 mt-auto">
+        <div class="container-lg d-flex justify-content-between small">
+            <span>&copy; 2025 - FYP1ManagementSystem</span>
+            <a asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

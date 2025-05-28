@@ -1,0 +1,46 @@
+﻿@model FYP1ManagementSystem.Models.EvaluationEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Evaluation";
+}
+
+<div class="container mt-5">
+    <div class="my-card">
+        <h3 class="mb-4 text-primary">✏️ Edit Evaluation for: @Model.StudentName</h3>
+
+        <form asp-action="EditEvaluation" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="ProposalId" />
+
+            <div class="mb-3">
+                <label class="form-label">Proposal Title</label>
+                <input type="text" class="form-control" value="@Model.Title" disabled />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CurrentStatus" class="form-label">Status</label>
+                <select asp-for="CurrentStatus" class="form-select">
+                    <option>Approved</option>
+                    <option>Approved with Condition</option>
+                    <option>Rejected</option>
+                </select>
+                <span asp-validation-for="CurrentStatus" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CurrentComment" class="form-label">Comment</label>
+                <textarea asp-for="CurrentComment" class="form-control" rows="5"></textarea>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="EvaluatorDashboard" class="btn btn-outline-secondary">← Back</a>
+                <button type="submit" class="btn btn-success">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

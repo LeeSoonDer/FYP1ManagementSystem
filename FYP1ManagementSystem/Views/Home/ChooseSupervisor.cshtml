@@ -4,32 +4,33 @@
     ViewData["Title"] = "Choose Your Supervisor";
 }
 
-<h2>Choose Your Supervisor</h2>
+<div class="container mt-5">
+    <h3 class="mb-4 text-center">Choose Your Supervisor</h3>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Full Name</th>
-            <th>Email</th>
-            <th>Faculty</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var supervisor in Model)
-        {
-            <tr>
-                <td>@supervisor.FullName</td>
-                <td>@supervisor.Email</td>
-                <td>@supervisor.Faculty</td>
-                <td>
-                    <form asp-action="SelectSupervisor" method="post">
-                        <input type="hidden" name="supervisorId" value="@supervisor.Id" />
-                        <button type="submit" class="btn btn-primary">Select</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            No supervisors available at the moment.
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var supervisor in Model)
+            {
+                <div class="col">
+                    <div class="my-card h-100">
+                        <h5 class="text-primary mb-2">@supervisor.FullName</h5>
+                        <p class="mb-1"><strong>Email:</strong> @supervisor.Email</p>
+                        <p class="mb-3"><strong>Faculty:</strong> @supervisor.Faculty</p>
 
+                        <form asp-action="SelectSupervisor" method="post" class="mt-auto">
+                            <input type="hidden" name="supervisorId" value="@supervisor.Id" />
+                            <button type="submit" class="btn my-btn my-btn-primary w-100">✔ Select</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

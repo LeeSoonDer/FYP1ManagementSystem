@@ -4,41 +4,86 @@
     ViewData["Title"] = "Proposal Details (Version)";
 }
 
-<h2>Proposal Detail</h2>
+<div class="container mt-4">
+    <div class="my-card">
+        <h3 class="mb-4 text-primary">Proposal Detail (Version)</h3>
 
-<table class="table">
-    <tr><th>Student</th><td>@Model.Student.FullName</td></tr>
-    <tr><th>Title</th><td>@Model.Title</td></tr>
-    <tr><th>Project Type</th><td>@Model.ProjectType</td></tr>
-    <tr><th>Status</th><td>@Model.Status</td></tr>
-    <tr><th>Submitted At</th><td>@Model.SubmittedAt.ToString("g")</td></tr>
-    <tr>
-        <th>PDF</th>
-        <td>
-            @if (!string.IsNullOrEmpty(Model.PdfPath))
-            {
-                <a href="@Model.PdfPath" class="btn btn-outline-primary" target="_blank">📄 View PDF</a>
-                <a href="@Model.PdfPath" download class="btn btn-outline-success ms-2">⬇️ Download PDF</a>
-            }
+        <table class="table table-bordered align-middle">
+            <tr>
+                <th style="width: 200px;">Student</th>
+                <td>@Model.Student.FullName</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>@Model.Title</td>
+            </tr>
+            <tr>
+                <th>Project Type</th>
+                <td>@Model.ProjectType</td>
+            </tr>
+            <tr>
+                <th>Submitted At</th>
+                <td>@Model.SubmittedAt.ToString("f")</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>
+                    @if (Model.Status == "Approved")
+                    {
+                        <span class="badge bg-success">@Model.Status</span>
+                    }
+                    else if (Model.Status == "Approved with Condition")
+                    {
+                        <span class="badge bg-warning text-dark">@Model.Status</span>
+                    }
+                    else if (Model.Status == "Rejected")
+                    {
+                        <span class="badge bg-danger">@Model.Status</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@Model.Status</span>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>📄 PDF</th>
+                <td>
+                    @if (!string.IsNullOrEmpty(Model.PdfPath))
+                    {
+                        <a href="@Model.PdfPath" class="btn btn-sm btn-outline-primary" target="_blank">📥 View</a>
+                        <a href="@Model.PdfPath" download class="btn btn-sm btn-outline-success ms-2">⬇️ Download</a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No file uploaded</span>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>Supervisor Comments</th>
+                <td>@(string.IsNullOrEmpty(Model.SupervisorComments) ? "<em>(None)</em>" : Model.SupervisorComments)</td>
+            </tr>
+            <tr>
+                <th>Evaluator 1</th>
+                <td>
+                    <strong>@(Model.Evaluation1Status ?? "-")</strong>
+                    <br />
+                    <span>@(Model.Evaluator1Comment ?? "(No comment)")</span>
+                </td>
+            </tr>
+            <tr>
+                <th>Evaluator 2</th>
+                <td>
+                    <strong>@(Model.Evaluation2Status ?? "-")</strong>
+                    <br />
+                    <span>@(Model.Evaluator2Comment ?? "(No comment)")</span>
+                </td>
+            </tr>
+        </table>
 
-            else
-            {
-                <span class="text-muted">No file uploaded</span>
-            }
-        </td>
-    </tr>
-    <tr>
-        <th>Supervisor Comments</th>
-        <td>@Model.SupervisorComments ?? "(None)"</td>
-    </tr>
-    <tr>
-        <th>Evaluator 1 Comments</th>
-        <td>@Model.Evaluation1Status - @Model.Evaluator1Comment</td>
-    </tr>
-    <tr>
-        <th>Evaluator 2 Comments</th>
-        <td>@Model.Evaluation2Status - @Model.Evaluator2Comment</td>
-    </tr>
-</table>
-
-<a asp-action="ProposalHistory" class="btn btn-secondary">Back</a>
+        <div class="text-end">
+            <a asp-action="ProposalHistory" class="btn btn-outline-secondary">← Back to History</a>
+        </div>
+    </div>
+</div>

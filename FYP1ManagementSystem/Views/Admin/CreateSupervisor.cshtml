@@ -4,84 +4,75 @@
     ViewData["Title"] = "Create Supervisor";
 }
 
-<div class="container mt-5">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">🧑‍🏫 Create New Supervisor</h4>
-            <a href="/Admin/ManageSupervisors" class="btn btn-light btn-sm">Back</a>
+<div class="container mt-5" style="max-width: 800px;">
+    <div class="my-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0">Create New Supervisor</h3>
+            <a href="/Admin/ManageSupervisors" class="btn btn-outline-secondary btn-sm">← Back</a>
         </div>
-        <div class="card-body">
-            <form asp-action="CreateSupervisor" method="post">
-                <div asp-validation-summary="All" class="text-danger"></div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="UserName" class="form-label">Username</label>
-                        <input asp-for="UserName" class="form-control" placeholder="e.g. johndoe" />
-                        <span asp-validation-for="UserName" class="text-danger"></span>
-                    </div>
+        <form asp-action="CreateSupervisor" method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Email" class="form-label">Email</label>
-                        <input asp-for="Email" class="form-control" placeholder="e.g. john@example.com" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="FullName" class="form-label">Full Name</label>
-                        <input asp-for="FullName" class="form-control" placeholder="e.g. John Doe" />
-                        <span asp-validation-for="FullName" class="text-danger"></span>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Faculty" class="form-label">Faculty</label>
-                        <input asp-for="Faculty" class="form-control" placeholder="e.g. Faculty of Computing" />
-                        <span asp-validation-for="Faculty" class="text-danger"></span>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="AcademicProgram" class="form-label">Academic Program</label>
-                        <select asp-for="AcademicProgram" class="form-select">
-                            <option value="">-- Select Program --</option>
-                            <option>Data Engineering</option>
-                            <option>Software Engineering</option>
-                        </select>
-                        <span asp-validation-for="AcademicProgram" class="text-danger"></span>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Password" class="form-label">Password</label>
-                        <div class="input-group">
-                            <input asp-for="Password" type="password" class="form-control" id="Password" autocomplete="new-password" />
-                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('Password')">👁</button>
-                        </div>
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
-                        <div class="input-group">
-                            <input asp-for="ConfirmPassword" type="password" class="form-control" id="ConfirmPassword" autocomplete="new-password" />
-                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('ConfirmPassword')">👁</button>
-                        </div>
-                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                    </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="UserName" class="my-form-label">Username</label>
+                    <input asp-for="UserName" class="form-control my-input" placeholder="e.g. johndoe" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
                 </div>
 
-                <div class="mt-3">
-                    <button type="submit" class="btn btn-primary w-100">➕ Create Supervisor</button>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Email" class="my-form-label">Email</label>
+                    <input asp-for="Email" class="form-control my-input" placeholder="e.g. john@example.com" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
-            </form>
-        </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="FullName" class="my-form-label">Full Name</label>
+                    <input asp-for="FullName" class="form-control my-input" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Faculty" class="my-form-label">Faculty</label>
+                    <input asp-for="Faculty" class="form-control my-input" />
+                    <span asp-validation-for="Faculty" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="AcademicProgram" class="my-form-label">Academic Program</label>
+                    <select asp-for="AcademicProgram" class="form-select my-input">
+                        <option value="">-- Select Program --</option>
+                        <option>Data Engineering</option>
+                        <option>Software Engineering</option>
+                    </select>
+                    <span asp-validation-for="AcademicProgram" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Password" class="my-form-label">Password</label>
+                    <div class="input-group">
+                        <input asp-for="Password" class="form-control my-input" type="password" id="Password" />
+                        <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('Password')">👁</button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ConfirmPassword" class="my-form-label">Confirm Password</label>
+                    <div class="input-group">
+                        <input asp-for="ConfirmPassword" class="form-control my-input" type="password" id="ConfirmPassword" />
+                        <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('ConfirmPassword')">👁</button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn my-btn my-btn-primary w-100">Create Supervisor</button>
+        </form>
     </div>
 </div>
 
 @section Scripts {
-    <script>
-        function togglePassword(id) {
-            const input = document.getElementById(id);
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-    </script>
     <partial name="_ValidationScriptsPartial" />
 }

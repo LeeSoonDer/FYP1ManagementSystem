@@ -4,99 +4,134 @@
     ViewData["Title"] = "Supervisor Dashboard";
 }
 
-<h2>Welcome Supervisor!</h2>
+<div class="container mt-4">
+    <div class="my-card">
+        <h3 class="text-primary mb-4">Supervisor Dashboard</h3>
 
-<form asp-action="SupervisorDashboard" method="get" class="form-inline mb-3">
-    <select name="semester" class="form-control mr-2">
-        <option value="">-- Semester --</option>
-        <option value="Semester 1">Semester 1</option>
-        <option value="Semester 2">Semester 2</option>
-    </select>
-    <select name="session" class="form-control mr-2">
-        <option value="">-- Academic Session --</option>
-        <option value="2024/2025">2024/2025</option>
-        <option value="2025/2026">2025/2026</option>
-    </select>
-    <button type="submit" class="btn btn-info">Filter</button>
-</form>
+        <form asp-action="SupervisorDashboard" method="get" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <select name="semester" class="form-select">
+                    <option value="">-- Filter by Semester --</option>
+                    <option value="Semester 1">Semester 1</option>
+                    <option value="Semester 2">Semester 2</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="session" class="form-select">
+                    <option value="">-- Filter by Academic Session --</option>
+                    <option value="2024/2025">2024/2025</option>
+                    <option value="2025/2026">2025/2026</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-info w-100">🔍 Apply Filters</button>
+            </div>
+        </form>
 
-
-@if (Model.Students.Any())
-{
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Student Name</th>
-                <th>Email</th>
-                <th>Proposal Title</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>View Proposal</th>
-                <th>Agreement</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var student in Model.Students)
-            {
-                var proposal = Model.Proposals.FirstOrDefault(p => p.StudentId == student.Id);
-
-                <tr>
-                    <td>@student.FullName</td>
-                    <td>@student.Email</td>
-                    <td>@proposal?.Title ?? "Not submitted"</td>
-                    <td>@proposal?.ProjectType ?? "-" </td>
-                    <td>@proposal?.Status ?? "-" </td>
-                    <td>
-                        @if (proposal != null)
+        @if (Model.Students.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Student</th>
+                            <th>Email</th>
+                            <th>Proposal Title</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>View</th>
+                            <th>Agreement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var student in Model.Students)
                         {
-                            <a asp-action="ViewProposal" asp-route-id="@proposal.ProposalId" class="btn btn-sm btn-outline-primary">
-                                View & Comment
-                            </a>
+                            var proposal = Model.Proposals.FirstOrDefault(p => p.StudentId == student.Id);
+                            <tr>
+                                <td>@student.FullName</td>
+                                <td>@student.Email</td>
+                                <td>@proposal?.Title ?? "<span class='text-muted'>Not submitted</span>"</td>
+                                <td>@proposal?.ProjectType ?? "-" </td>
+                                <td>
+                                    @if (proposal != null)
+                                    {
+                                        var status = proposal.Status ?? "Pending";
+                                        if (status == "Approved")
+                                        {
+                                            <span class="badge bg-success">@status</span>
+                                        }
+                                        else if (status == "Approved with Condition")
+                                        {
+                                            <span class="badge bg-warning text-dark">@status</span>
+                                        }
+                                        else if (status == "Rejected")
+                                        {
+                                            <span class="badge bg-danger">@status</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@status</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (proposal != null)
+                                    {
+                                        <a asp-action="ViewProposal" asp-route-id="@proposal.ProposalId" class="btn btn-sm btn-outline-primary">
+                                            View & Comment
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (student.IsSupervisorApproved)
+                                    {
+                                        if (!student.IsStudentAgreed && !student.IsSupervisorAgreed)
+                                        {
+                                            <span class="text-muted">Waiting for student</span>
+                                        }
+                                        else if (student.IsStudentAgreed && !student.IsSupervisorAgreed)
+                                        {
+                                            <form asp-action="AgreeWithStudent" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="studentId" value="@student.Id" />
+                                                <button type="submit" class="btn btn-sm btn-success">I Agree</button>
+                                            </form>
+                                        }
+                                        else if (!student.IsStudentAgreed && student.IsSupervisorAgreed)
+                                        {
+                                            <span class="text-warning">Waiting for student</span>
+                                        }
+                                        else if (student.IsStudentAgreed && student.IsSupervisorAgreed)
+                                        {
+                                            <span class="text-success">✅ Agreement Complete</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Pending Approval</span>
+                                    }
+                                </td>
+                            </tr>
                         }
-                        else
-                        {
-                            <span class="text-muted">N/A</span>
-                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">No students have selected you yet.</div>
+        }
 
-                    </td>
-                    <td>
-                        @if (student.IsSupervisorApproved)
-                        {
-                            if (!student.IsStudentAgreed && !student.IsSupervisorAgreed)
-                            {
-                                <span class="text-muted">Waiting for student</span>
-                            }
-                            else if (student.IsStudentAgreed && !student.IsSupervisorAgreed)
-                            {
-                                <form asp-action="AgreeWithStudent" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="studentId" value="@student.Id" />
-                                    <button type="submit" class="btn btn-sm btn-success">I Agree</button>
-                                </form>
-                            }
-                            else if (!student.IsStudentAgreed && student.IsSupervisorAgreed)
-                            {
-                                <span class="text-warning">Waiting for student</span>
-                            }
-                            else if (student.IsStudentAgreed && student.IsSupervisorAgreed)
-                            {
-                                <span class="text-success">Agreement Complete</span>
-                            }
-                        }
-                        else
-                        {
-                            <span class="text-muted">Pending Approval</span>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No students have selected you yet.</p>
-}
-
-<a asp-action="ProposalHistory">View Proposal History</a>
-
+        <div class="mt-4 text-end">
+            <a asp-action="ProposalHistory" class="btn btn-outline-secondary">View Proposal History</a>
+        </div>
+    </div>
+</div>

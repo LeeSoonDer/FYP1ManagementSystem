@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using FYP1ManagementSystem.Data;
 
 
 namespace FYP1ManagementSystem.Controllers
@@ -12,12 +14,15 @@ namespace FYP1ManagementSystem.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly AppDbContext _context;
 
         public AccountController(UserManager<ApplicationUser> userManager,
-                                 SignInManager<ApplicationUser> signInManager)
+                                 SignInManager<ApplicationUser> signInManager,
+                                 AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
 
         [HttpGet]
@@ -81,6 +86,12 @@ namespace FYP1ManagementSystem.Controllers
             return View();
         }
 
+        private bool IsUserEvaluator(string userId)
+        {
+            return _context.Proposals.Any(p => p.Evaluator1Id == userId || p.Evaluator2Id == userId);
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -111,8 +122,12 @@ namespace FYP1ManagementSystem.Controllers
                             if (user.IsCommittee)
                                 return RedirectToAction("CommitteeDashboard", "Home");
 
+                            if (IsUserEvaluator(user.Id))
+                                return RedirectToAction("EvaluatorDashboard", "Home");
+
                             return RedirectToAction("SupervisorDashboard", "Home");
                         }
+
 
                         // 如果没有识别出角色，回主页
                         return RedirectToAction("Index", "Home");

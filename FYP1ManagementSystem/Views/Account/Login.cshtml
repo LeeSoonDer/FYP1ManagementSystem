@@ -4,39 +4,41 @@
     ViewData["Title"] = "Login";
 }
 
-@if (TempData["RegisterSuccess"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["RegisterSuccess"]
+<div class="container mt-5" style="max-width: 500px;">
+    <div class="my-card">
+        <h3 class="mb-4 text-center">🔐 User Login</h3>
+
+        @if (TempData["RegisterSuccess"] != null)
+        {
+            <div class="alert alert-success">@TempData["RegisterSuccess"]</div>
+        }
+
+        <form asp-action="Login" method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="my-form-label"></label>
+                <input asp-for="UserName" class="form-control my-input" placeholder="Enter your username" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="my-form-label"></label>
+                <div class="input-group">
+                    <input asp-for="Password" class="form-control my-input" type="password" id="Password" placeholder="••••••" />
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('Password')">👁</button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label"></label>
+            </div>
+
+            <button type="submit" class="btn my-btn my-btn-primary w-100">Login</button>
+        </form>
     </div>
-}
-
-
-<div class="container mt-5">
-    <h2 class="mb-4">User Login</h2>
-
-    <form asp-action="Login" method="post">
-        <div asp-validation-summary="All" class="text-danger"></div>
-
-        <div class="form-group mb-3">
-            <label asp-for="UserName"></label>
-            <input asp-for="UserName" class="form-control" />
-            <span asp-validation-for="UserName" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="Password"></label>
-            <input asp-for="Password" class="form-control" />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
-
-        <div class="form-check mb-3">
-            <input asp-for="RememberMe" class="form-check-input" />
-            <label asp-for="RememberMe" class="form-check-label"></label>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
 </div>
 
 @section Scripts {

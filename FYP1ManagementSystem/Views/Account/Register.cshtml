@@ -4,96 +4,104 @@
     ViewData["Title"] = "Register";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="my-card">
+        <h3 class="text-center mb-4">🎓 Student Registration</h3>
 
-@if (TempData["RegisterSuccess"] != null)
-{
-    <div class="alert alert-success">@TempData["RegisterSuccess"]</div>
-}
+        @if (TempData["RegisterSuccess"] != null)
+        {
+            <div class="alert alert-success">@TempData["RegisterSuccess"]</div>
+        }
 
-<form asp-action="Register" method="post">
-    <div class="form-group">
-        <label asp-for="UserName"></label>
-        <input asp-for="UserName" class="form-control" />
-        <span asp-validation-for="UserName" class="text-danger"></span>
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="my-form-label"></label>
+                <input asp-for="UserName" class="form-control my-input" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="my-form-label"></label>
+                <input asp-for="Email" class="form-control my-input" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="my-form-label"></label>
+                <input asp-for="FullName" class="form-control my-input" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Faculty" class="my-form-label"></label>
+                <select asp-for="Faculty" class="form-control my-input">
+                    <option value="">-- Select Faculty --</option>
+                    <option>FACULTY OF CIVIL ENGINEERING</option>
+                    <option>FACULTY OF CHEMICAL ENGINEERING and Energy Engineering</option>
+                    <option>FACULTY OF MECHANICAL ENGINEERING</option>
+                    <option>FACULTY OF ELECTRICAL ENGINEERING</option>
+                    <option>FACULTY OF COMPUTING</option>
+                    <option>FACULTY OF ARTIFICIAL INTELLIGENCE</option>
+                    <option>FACULTY OF SCIENCE</option>
+                    <option>FACULTY OF BUILT ENVIRONMENT and Surveying</option>
+                    <option>FACULTY OF SOCIAL SCIENCES and Humanities</option>
+                    <option>FACULTY OF MANAGEMENT</option>
+                    <option>MALAYSIA-JAPAN INTERNATIONAL Institute of Technology</option>
+                    <option>AZMAN HASHIM INTERNATIONAL Business School</option>
+                    <option>FACULTY OF EDUCATIONAL SCIENCES AND TECHNOLOGY</option>
+                </select>
+                <span asp-validation-for="Faculty" class="text-danger"></span>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <label asp-for="Year" class="my-form-label"></label>
+                    <select asp-for="Year" class="form-control my-input">
+                        <option value="">-- Select Year --</option>
+                        <option>Year 3</option>
+                        <option>Year 4</option>
+                    </select>
+                    <span asp-validation-for="Year" class="text-danger"></span>
+                </div>
+                <div class="col">
+                    <label asp-for="Semester" class="my-form-label"></label>
+                    <select asp-for="Semester" class="form-control my-input">
+                        <option value="">-- Select Semester --</option>
+                        <option>Semester 1</option>
+                        <option>Semester 2</option>
+                    </select>
+                    <span asp-validation-for="Semester" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AcademicSession" class="my-form-label"></label>
+                <input asp-for="AcademicSession" class="form-control my-input" placeholder="e.g. 2024/2025" />
+                <span asp-validation-for="AcademicSession" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="my-form-label"></label>
+                <div class="input-group">
+                    <input asp-for="Password" class="form-control my-input" type="password" id="Password" />
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordVisibility('Password')">👁</button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="my-form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control my-input" type="password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn my-btn my-btn-primary w-100">Register</button>
+        </form>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="FullName"></label>
-        <input asp-for="FullName" class="form-control" />
-        <span asp-validation-for="FullName" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Faculty"></label>
-        <select asp-for="Faculty" class="form-control">
-            <option value="">-- Select Faculty --</option>
-            <option>FACULTY OF CIVIL ENGINEERING</option>
-            <option>FACULTY OF CHEMICAL ENGINEERING and Energy Engineering</option>
-            <option>FACULTY OF MECHANICAL ENGINEERING</option>
-            <option>FACULTY OF ELECTRICAL ENGINEERING</option>
-            <option>FACULTY OF COMPUTING</option>
-            <option>FACULTY OF ARTIFICIAL INTELLIGENCE</option>
-            <option>FACULTY OF SCIENCE</option>
-            <option>FACULTY OF BUILT ENVIRONMENT and Surveying</option>
-            <option>FACULTY OF SOCIAL SCIENCES and Humanities</option>
-            <option>FACULTY OF MANAGEMENT</option>
-            <option>MALAYSIA-JAPAN INTERNATIONAL Institute of Technology</option>
-            <option>AZMAN HASHIM INTERNATIONAL Business School</option>
-            <option>FACULTY OF EDUCATIONAL SCIENCES AND TECHNOLOGY</option>
-        </select>
-        <span asp-validation-for="Faculty" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Year"></label>
-        <select asp-for="Year" class="form-control">
-            <option value="">-- Select Year --</option>
-            <option>Year 3</option>
-            <option>Year 4</option>
-        </select>
-        <span asp-validation-for="Year" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Semester"></label>
-        <select asp-for="Semester" class="form-control">
-            <option value="">-- Select Semester --</option>
-            <option>Semester 1</option>
-            <option>Semester 2</option>
-        </select>
-        <span asp-validation-for="Semester" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="AcademicSession"></label>
-        <input asp-for="AcademicSession" class="form-control" placeholder="e.g. 2024/2025" />
-        <span asp-validation-for="AcademicSession" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="ConfirmPassword"></label>
-        <input asp-for="ConfirmPassword" class="form-control" />
-        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Register</button>
-</form>
+</div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

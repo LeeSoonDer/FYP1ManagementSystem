@@ -200,10 +200,25 @@ namespace FYP1ManagementSystem.Controllers
             return View(proposal);
         }
 
+        [Authorize]
         public async Task<IActionResult> ProposalHistory(string studentId = null)
         {
             var user = await _userManager.GetUserAsync(User);
-            string targetStudentId = studentId ?? user.Id;
+
+            // 如果访问的是其他人的数据
+            if (!string.IsNullOrEmpty(studentId) && studentId != user.Id)
+            {
+                // 如果不是 Committee，就禁止访问
+                if (!user.IsCommittee)
+                {
+                    return Forbid(); // 或 RedirectToAction("AccessDenied")
+                }
+
+                var targetStudent = await _userManager.FindByIdAsync(studentId);
+                ViewBag.TargetStudentName = targetStudent?.FullName ?? "Unknown Student";
+            }
+
+            var targetStudentId = studentId ?? user.Id;
 
             var proposals = await _context.Proposals
                 .Where(p => p.StudentId == targetStudentId)
@@ -212,6 +227,7 @@ namespace FYP1ManagementSystem.Controllers
 
             return View(proposals);
         }
+
 
 
 
@@ -233,41 +249,31 @@ namespace FYP1ManagementSystem.Controllers
             return RedirectToAction("SupervisorDashboard");
         }
 
-        [HttpGet]
         [Authorize(Roles = "Supervisor")]
         public async Task<IActionResult> CommitteeDashboard()
         {
-            var committee = await _userManager.GetUserAsync(User);
-
-            if (committee == null || !(await _userManager.IsInRoleAsync(committee, "Supervisor")) || !committee.IsCommittee)
-            {
-                return Unauthorized();
-            }
+            var students = await _userManager.Users
+                .Where(u => u.SupervisorId != null)
+                .ToListAsync();
 
             var proposals = await _context.Proposals
                 .Include(p => p.Student)
-                .Include(p => p.Evaluator1)
-                .Include(p => p.Evaluator2)
-                .Where(p => p.Student.Faculty == committee.Faculty)
                 .ToListAsync();
 
-            var allUsers = await _userManager.Users.ToListAsync();
+            var evaluators = await _userManager.Users
+                .Where(u => u.AcademicProgram != null || u.IsCommittee)
+                .ToListAsync();
 
-            var supervisors = allUsers
-                .Where(u => u.Faculty == committee.Faculty && _userManager.IsInRoleAsync(u, "Supervisor").Result)
-                .ToList();
-
-            var evaluators = supervisors; // ✅ 所有 Supervisor 都可以是 Evaluator（包含 Committee）
-
-            var viewModel = new CommitteeDashboardViewModel
+            var model = new CommitteeDashboardViewModel
             {
+                StudentsWithSupervisor = students,
                 Proposals = proposals,
-                Evaluators = evaluators,
-                Supervisors = supervisors
+                Evaluators = evaluators
             };
 
-            return View(viewModel);
+            return View(model);
         }
+
 
 
         [HttpPost]
@@ -289,11 +295,18 @@ namespace FYP1ManagementSystem.Controllers
                 {
                     proposal.Evaluator1Id = evaluator1Id;
                     proposal.Evaluator2Id = evaluator2Id;
+
+                    proposal.Status = "Rejected";
+
+                    _context.Proposals.Update(proposal);
                     await _context.SaveChangesAsync();
+
+                    TempData["AssignSuccess"] = "✅ Evaluators assigned successfully!";
+
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Cannot assign supervisor as evaluator.");
+                    ModelState.AddModelError("", "Cannot assign the supervisor of this student as evaluator.");
                 }
             }
 
@@ -368,6 +381,76 @@ namespace FYP1ManagementSystem.Controllers
             return RedirectToAction("EvaluatorDashboard");
         }
 
+        [Authorize(Roles = "Supervisor")]
+        [HttpGet]
+        public async Task<IActionResult> EditEvaluation(int id)
+        {
+            var proposal = await _context.Proposals
+                .Include(p => p.Student)
+                .FirstOrDefaultAsync(p => p.ProposalId == id);
+
+            if (proposal == null)
+                return NotFound();
+
+            var evaluator = await _userManager.GetUserAsync(User);
+            if (evaluator == null)
+                return Unauthorized();
+
+            // 确保当前用户是分配的评审人
+            bool isEvaluator1 = proposal.Evaluator1Id == evaluator.Id;
+            bool isEvaluator2 = proposal.Evaluator2Id == evaluator.Id;
+
+            if (!isEvaluator1 && !isEvaluator2)
+                return Forbid();
+
+            // 用 ViewModel 传递必要信息
+            var viewModel = new EvaluationEditViewModel
+            {
+                ProposalId = proposal.ProposalId,
+                Title = proposal.Title,
+                StudentName = proposal.Student?.FullName,
+                CurrentStatus = isEvaluator1 ? proposal.Evaluation1Status : proposal.Evaluation2Status,
+                CurrentComment = isEvaluator1 ? proposal.Evaluator1Comment : proposal.Evaluator2Comment
+            };
+
+            return View(viewModel);
+        }
+
+        [Authorize(Roles = "Supervisor")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditEvaluation(EvaluationEditViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var proposal = await _context.Proposals.FindAsync(model.ProposalId);
+            var evaluator = await _userManager.GetUserAsync(User);
+
+            if (proposal == null || evaluator == null)
+                return NotFound();
+
+            bool isEvaluator1 = proposal.Evaluator1Id == evaluator.Id;
+            bool isEvaluator2 = proposal.Evaluator2Id == evaluator.Id;
+
+            if (!isEvaluator1 && !isEvaluator2)
+                return Forbid();
+
+            if (isEvaluator1)
+            {
+                proposal.Evaluation1Status = model.CurrentStatus;
+                proposal.Evaluator1Comment = model.CurrentComment;
+            }
+            else if (isEvaluator2)
+            {
+                proposal.Evaluation2Status = model.CurrentStatus;
+                proposal.Evaluator2Comment = model.CurrentComment;
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "✅ Evaluation updated successfully.";
+            return RedirectToAction("EvaluatorDashboard");
+        }
 
 
 
@@ -448,29 +531,36 @@ namespace FYP1ManagementSystem.Controllers
             if (committee == null || !committee.IsCommittee)
                 return Unauthorized();
 
-            // 拿所有学生
-            var studentsQuery = _userManager.Users
-                .Where(u => _userManager.IsInRoleAsync(u, "Student").Result);
+            // 拉出所有用户（或优化为只取有 SupervisorId 的）
+            var allUsers = await _userManager.Users.ToListAsync();
+
+            // 本地过滤角色
+            var students = new List<ApplicationUser>();
+            foreach (var user in allUsers)
+            {
+                if (await _userManager.IsInRoleAsync(user, "Student"))
+                    students.Add(user);
+            }
 
             if (!string.IsNullOrEmpty(program))
             {
-                studentsQuery = studentsQuery.Where(s => s.AcademicProgram == program);
+                students = students.Where(s => s.AcademicProgram == program).ToList();
             }
 
-            var students = await studentsQuery.ToListAsync();
-
-            // 用于下拉列表的 program 来源
-            var programs = await _userManager.Users
-                .Where(u => u.AcademicProgram != null)
+            // dropdown program options
+            var programs = allUsers
+                .Where(u => !string.IsNullOrEmpty(u.AcademicProgram))
                 .Select(u => u.AcademicProgram)
                 .Distinct()
-                .ToListAsync();
+                .ToList();
 
             ViewBag.Programs = programs;
             ViewBag.SelectedProgram = program;
 
             return View(students);
         }
+
+
 
     }
 }

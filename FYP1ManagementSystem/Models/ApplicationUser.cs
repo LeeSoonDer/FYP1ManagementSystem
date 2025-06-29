@@ -8,12 +8,12 @@ namespace FYP1ManagementSystem.Models
         public string? Faculty { get; set; }
         public string? AcademicProgram { get; set; } // Data Engineering / Software Engineering
         public string? Domain { get; set; } // Research / Development
-        public bool IsCommittee { get; set; } = false; // 是否是 Committee 成员
+        public bool IsCommittee { get; set; } = false; 
         public string? Year { get; set; } // Year 3 / 4
         public string? Semester { get; set; } // Semester 1 / 2
-        public string? AcademicSession { get; set; } // 2024/2025 等
-        public string? SupervisorId { get; set; } // 选择的导师
-        public bool IsSupervisorApproved { get; set; } = false; // 是否通过审批
+        public string? AcademicSession { get; set; } // 2024/2025 
+        public string? SupervisorId { get; set; }
+        public bool IsSupervisorApproved { get; set; } = false; 
         public bool IsStudentAgreed { get; set; } = false;
         public bool IsSupervisorAgreed { get; set; } = false;
 

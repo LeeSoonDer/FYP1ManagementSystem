@@ -35,7 +35,7 @@ namespace FYP1ManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            // ✅ 学生专属字段验证
+            
             if (string.IsNullOrEmpty(model.Faculty))
                 ModelState.AddModelError("Faculty", "Faculty is required.");
 
@@ -110,7 +110,7 @@ namespace FYP1ManagementSystem.Controllers
 
                     if (user != null)
                     {
-                        // ✅ 登录后根据角色跳转
+                        
                         if (await _userManager.IsInRoleAsync(user, "Admin"))
                             return RedirectToAction("AdminDashboard", "Admin");
 
@@ -129,7 +129,7 @@ namespace FYP1ManagementSystem.Controllers
                         }
 
 
-                        // 如果没有识别出角色，回主页
+                        
                         return RedirectToAction("Index", "Home");
                     }
 

@@ -21,7 +21,7 @@ namespace FYP1ManagementSystem.Data
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            // 1️⃣ Admin account
+            //Admin account
             if (await userManager.FindByNameAsync("admin") == null)
             {
                 var admin = new ApplicationUser
@@ -35,7 +35,7 @@ namespace FYP1ManagementSystem.Data
                 await userManager.AddToRoleAsync(admin, "Admin");
             }
 
-            // 2️⃣ Create 3 students
+            //Create 3 students
             var students = new List<ApplicationUser>
             {
                 new ApplicationUser

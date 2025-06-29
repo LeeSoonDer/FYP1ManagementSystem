@@ -14,7 +14,7 @@ namespace FYP1ManagementSystem.Models
         [Required]
         public string ProjectType { get; set; } // Research or Development
 
-        public string? PdfPath { get; set; } // 上传的文件路径（可选）
+        public string? PdfPath { get; set; } 
 
         public string Status { get; set; } = "Pending"; // Accepted, Conditional, Rejected
 

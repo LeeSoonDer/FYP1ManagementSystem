@@ -100,7 +100,7 @@ namespace FYP1ManagementSystem.Controllers
 
                 if (model.UploadedFile != null && model.UploadedFile.Length > 0)
                 {
-                    // ✅ 强化文件类型验证
+                   
                     var extension = Path.GetExtension(model.UploadedFile.FileName);
                     if (string.IsNullOrEmpty(extension) || extension.ToLower() != ".pdf")
                     {
@@ -108,14 +108,14 @@ namespace FYP1ManagementSystem.Controllers
                         return View(model);
                     }
 
-                    // （可选）进一步检查 MIME 类型
+                    
                     if (model.UploadedFile.ContentType != "application/pdf")
                     {
                         ModelState.AddModelError("UploadedFile", "Uploaded file must be a valid PDF.");
                         return View(model);
                     }
 
-                    // ✅ 保存 PDF 文件
+                    
                     var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
                     Directory.CreateDirectory(uploads);
 
@@ -130,7 +130,7 @@ namespace FYP1ManagementSystem.Controllers
                     pdfPath = "/uploads/" + fileName;
                 }
 
-                // ✅ 提案版本控制
+                
                 var lastVersion = await _context.Proposals
                     .Where(p => p.StudentId == student.Id)
                     .OrderByDescending(p => p.Version)
@@ -205,13 +205,13 @@ namespace FYP1ManagementSystem.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            // 如果访问的是其他人的数据
+            
             if (!string.IsNullOrEmpty(studentId) && studentId != user.Id)
             {
-                // 如果不是 Committee，就禁止访问
+                
                 if (!user.IsCommittee)
                 {
-                    return Forbid(); // 或 RedirectToAction("AccessDenied")
+                    return Forbid(); 
                 }
 
                 var targetStudent = await _userManager.FindByIdAsync(studentId);
@@ -346,7 +346,7 @@ namespace FYP1ManagementSystem.Controllers
             var status = Request.Form[statusKey];
             var comment = Request.Form[commentKey];
 
-            // ✅ 区分是评审1还是评审2
+           
             if (proposal.Evaluator1Id == evaluator.Id)
             {
                 proposal.Evaluation1Status = status;
@@ -396,14 +396,14 @@ namespace FYP1ManagementSystem.Controllers
             if (evaluator == null)
                 return Unauthorized();
 
-            // 确保当前用户是分配的评审人
+            
             bool isEvaluator1 = proposal.Evaluator1Id == evaluator.Id;
             bool isEvaluator2 = proposal.Evaluator2Id == evaluator.Id;
 
             if (!isEvaluator1 && !isEvaluator2)
                 return Forbid();
 
-            // 用 ViewModel 传递必要信息
+            
             var viewModel = new EvaluationEditViewModel
             {
                 ProposalId = proposal.ProposalId,
@@ -531,10 +531,10 @@ namespace FYP1ManagementSystem.Controllers
             if (committee == null || !committee.IsCommittee)
                 return Unauthorized();
 
-            // 拉出所有用户（或优化为只取有 SupervisorId 的）
+            
             var allUsers = await _userManager.Users.ToListAsync();
 
-            // 本地过滤角色
+           
             var students = new List<ApplicationUser>();
             foreach (var user in allUsers)
             {

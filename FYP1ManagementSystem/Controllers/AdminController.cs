@@ -64,7 +64,7 @@ namespace FYP1ManagementSystem.Controllers
         public IActionResult ManageSupervisors()
         {
             var supervisors = _userManager.Users
-                .Where(u => u.AcademicProgram != null) // 仅导师
+                .Where(u => u.AcademicProgram != null) 
                 .ToList();
 
             return View(supervisors);
